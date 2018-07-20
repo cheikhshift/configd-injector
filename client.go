@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-const apiURL = "http://localhost:8080/get_configuration" //"https://configd.gophersauce.com/get_configuration"
+const apiURL = "https://configd.gophersauce.com/get_configuration"
 
 func ReadBody(r *http.Response) string {
 	body, _ := ioutil.ReadAll(r.Body)
