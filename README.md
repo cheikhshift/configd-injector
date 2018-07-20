@@ -43,7 +43,7 @@ You can import your configuration data with the following package path : `import
 
 To access data, configd package has an exported variable named Settings with your configuration data with type `map[string]interface{}`.
 
-You must assert your types, Settings has type `map[string]interface{}`. The configd package features a set of exported helper functions to help with interface assertion. Here are a list of the configd package functions :
+You must assert your types, Settings has type `map[string]interface{}`. The configd package features a set of exported helper functions to help with interface assertion. Here is a list of the configd package functions :
 
 - func Int(i interface{}) int64 
 - func Bool(i interface{}) bool 
