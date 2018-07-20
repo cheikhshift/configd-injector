@@ -41,7 +41,7 @@ Prepare for Go :
 
 You can import your configuration data with the following package path : `import "configd"`.
 
-To access data, configd package has an exported variable named Settings with your configuration data as a map.
+To access data, configd package has an exported variable named Settings with your configuration data as a `map[string]interface{}`.
 
 You must assert your types, Settings has type `map[string]interface{}`. The configd package features a set of exported helper functions to help with interface assertion. Here are a list of the configd package functions :
 
