@@ -7,7 +7,6 @@ The configd-injector adds your config'd configuration to your project as a depen
 - [Linux Binary](https://github.com/cheikhshift/configd-injector/raw/master/configd-injector.tar.gz)
 	- md5 checksum of binary : fbde23b8af35e2cc3e2497c354cc4464
 
-<<<<<<< HEAD
 # Install binary on linux
 
 ### Download binary
@@ -26,8 +25,6 @@ Run the following command to download binary
 	sudo mv configd-injector /usr/sbin/
 
 
-=======
->>>>>>> parent of 40bbed1... add linux install instructions and binary.
 # Requirements (to build)
 
 - Go 1.8+
