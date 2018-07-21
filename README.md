@@ -77,6 +77,10 @@ You must assert your types, Settings has type `map[string]interface{}`. The conf
 - Support PHP composer.
 - Support Ruby Gems.
 - Manage lifecycle of web application.
+- Kubernetes operator, to enable live reloads.
+- Docker container image.
+  - To enable live reloads.
+  - To feature deployment without rebuilding docker image.
 
 ### Contribution
 
