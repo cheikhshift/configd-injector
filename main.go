@@ -13,9 +13,9 @@ func main() {
 	configD := os.Getenv("CONFIGD")
 	
 	// Set program's default API url with
-	// environment variable CONFIGD_URI,
+	// environment variable CONFIGD_URL,
 	// if value is present  
-	if hostName := os.Getenv("CONFIGD_URI"); hostName != "" {
+	if hostName := os.Getenv("CONFIGD_URL"); hostName != "" {
 		apiURL = hostName
 	}
 
