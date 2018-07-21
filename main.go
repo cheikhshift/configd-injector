@@ -11,6 +11,15 @@ import (
 func main() {
 
 	configD := os.Getenv("CONFIGD")
+	
+	// Set program's default API url with
+	// environment variaoble CONFIGD_HOST,
+	// if value is present  
+	if hostName := os.Getenv("CONFIGD_HOST"); hostName != "" {
+		apiURL = hostName
+	}
+
+
 
 	projectPath := flag.String("path", "./", "Path to project root.")
 	configKey := flag.String("key", configD, "Config'D API Key")
@@ -29,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if res.StatusCode != 200 {
-		err := errors.New("Error, please verify your API key set. ")
+		err := errors.New("Error, please verify your API key. ")
 		log.Fatal(err)
 	}
 

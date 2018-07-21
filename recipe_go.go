@@ -34,6 +34,10 @@ func String(i interface{}) string {
 	return i.(string)
 }
 
+func Float64(i interface{}) float64 {
+	return i.(float64)
+}
+
 func Map(i interface{}) map[string]interface{} {
 	return i.(dictionary)
 }
