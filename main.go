@@ -25,8 +25,9 @@ func main() {
 	configKey := flag.String("key", configD, "Config'D API Key")
 
 	isNode := flag.Bool("node", false, "Specify if injector should use NodeJS recipe.")
-	isGo := flag.Bool("go", false, "Specify if injector should use Go recipe.")
+	isGo := flag.Bool("go", false, "Specify if injector should use Go recipe. Your configuration data will be accessible via `map[string]interface{}`")
 	isJava := flag.Bool("java", false, "Specify if injector should use Java recipe.")
+	isGoStruct := flag.Bool("goStruct", false, "Specify if injector should use Go recipe. Your configuration data json will be parsed with struct literals.")
 
 	flag.Parse()
 
@@ -60,6 +61,10 @@ func main() {
 
 	if *isGo {
 		ExportForGo(body)
+	}
+
+	if *isGoStruct {
+		ExportForGoStructs(body)
 	}
 
 }

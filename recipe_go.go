@@ -18,9 +18,7 @@ import (
 
 type dictionary map[string]interface{}
 
-var intConf = ParseJSON(%s)
-
-var Settings = intConf["Config"].(map[string]interface{})
+var Settings = ParseJSON(%s)
 
 func Int(i interface{}) int64 {
 	return i.(int64)
@@ -59,7 +57,8 @@ func ParseJSON(j string) (dictionary) {
 
 func ExportForGo(config string) {
 	CreateVendorFolder()
-	config = fmt.Sprintf("`%s`", config)
+	data := GetConfig(config)
+	config = fmt.Sprintf("`%s`", string(data))
 	moduleStr := fmt.Sprintf(GoTemplate, config)
 	module := []byte(moduleStr)
 	err := ioutil.WriteFile("vendor/configd/c.go", module, 0700)
