@@ -70,7 +70,7 @@ You must assert your types, Settings has type `map[string]interface{}`. The conf
 - func Map(i interface{}) map[string]interface{} 
 
  
- Find more integration guides at the [wiki](https://github.com/cheikhshift/configd/wik)
+ Find more integration guides at the [wiki](https://github.com/cheikhshift/configd/wiki)
 
 
 ## Roadmap
