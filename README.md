@@ -38,9 +38,6 @@ Run the following command to download binary
 
 	go get github.com/cheikhshift/configd-injector
 
-## Compatibility
-
-configd-injector supports NodeJS and Go at the moment.
 
 ### Usage
 
@@ -73,6 +70,7 @@ You must assert your types, Settings has type `map[string]interface{}`. The conf
 - func Map(i interface{}) map[string]interface{} 
 
  
+ Find more integration guides at the [wiki](https://github.com/cheikhshift/configd/wik)
 
 
 ## Roadmap
