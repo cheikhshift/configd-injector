@@ -24,8 +24,9 @@ func main() {
 	projectPath := flag.String("path", "./", "Path to project root.")
 	configKey := flag.String("key", configD, "Config'D API Key")
 
-	isNode := flag.Bool("node", false, "Specify if launcher should use NodeJS recipe.")
-	isGo := flag.Bool("go", false, "Specify if launcher should use Go recipe.")
+	isNode := flag.Bool("node", false, "Specify if injector should use NodeJS recipe.")
+	isGo := flag.Bool("go", false, "Specify if injector should use Go recipe.")
+	isJava := flag.Bool("java", false, "Specify if injector should use Java recipe.")
 
 	flag.Parse()
 
@@ -51,6 +52,10 @@ func main() {
 
 	if *isNode {
 		ExportForNode(body)
+	}
+
+	if *isJava {
+		ExportForJava(body)
 	}
 
 	if *isGo {
