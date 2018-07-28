@@ -7,7 +7,7 @@ The configd-injector adds your config'd configuration to your project as a depen
 - [Linux Binary](https://github.com/cheikhshift/configd-injector/raw/master/configd-injector.tar.gz)
 	- md5 checksum of binary : c1b34eddb4aa769ca2b9c8c49c3252c7
 
-- [Windows Binary](https://github.com/cheikhshift/configd-injector/raw/master/configd-injector.exe.gz)
+- [Windows Binary](https://github.com/cheikhshift/configd-injector/raw/master/configd-injector.exe.zip)
 	- md5 checksum of binary : 7541adc63cb1c8cdc3702d36a0b3a431
 
 # Install binary on linux
