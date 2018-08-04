@@ -137,6 +137,16 @@ func (m *Model) WriteJava() {
 	m.print(fu, gsonTempl)
 }
 
+func (m *Model) WriteTypeScript() {
+	fu := func(ms map[string]interface{}) {
+		v, n := m.parseMapTS(ms)
+		if v != nil {
+			m.parseArrayTS(v, n)
+		}
+	}
+	m.print(fu, TSTempl)
+}
+
 func printTempl(w io.Writer, templData string, name string, isArray bool) {
 	tmpl, err := template.New("test").Parse(templData)
 	if err != nil {
@@ -266,7 +276,7 @@ func (m *Model) parseMapJava(ms map[string]interface{}) ([]map[string]interface{
 					m.printWithValuesJava("float[]", k, str)
 				case []interface{}:
 					m.printValuesJava(name+"[]", k)
-					data = append(data, vvv[0].(map[string]interface{}))
+					data = append(data, vv[0].(map[string]interface{}))
 					names = append(names, k)
 				case map[string]interface{}:
 					m.printWithArrayJava(name+"[]", k,v)
@@ -287,6 +297,62 @@ func (m *Model) parseMapJava(ms map[string]interface{}) ([]map[string]interface{
 			names = append(names, k)
 		default:
 			m.printValuesJava("Object", k)
+		}
+	}
+	return data, names
+}
+
+func (m *Model) parseMapTS(ms map[string]interface{}) ([]map[string]interface{}, []string) {
+	var data []map[string]interface{}
+	var names []string
+	for k, v := range ms {
+		name := replaceName(k)
+		switch vv := v.(type) {
+		case string:
+			str := fmt.Sprintf(`"%s"`, v)
+			m.printWithValuesTS("string", k, str)
+		case float64:
+			if float64(int(vv)) == vv {
+				m.printWithValuesTS("number", k, v)
+			} else {
+				m.printWithValuesTS("number", k, v)
+			}
+		case bool:
+			m.printWithValuesTS("boolean", k, v)
+		case []interface{}:
+			if len(vv) > 0 {
+				switch vvv := vv[0].(type) {
+				case string:
+					arr := ArrayToString(v, `","`)
+					str := fmt.Sprintf(`["%s"]`, arr)
+					m.printWithValuesTS("[]", k, str)
+				case float64:
+					arr := ArrayToString(v, `,`)
+					str := fmt.Sprintf(`[%s]`, arr)
+					m.printWithValuesTS("[]", k, str)
+				case []interface{}:
+					m.printWithArrayTS("[]", k, v)
+					data = append(data, vv[0].(map[string]interface{}))
+					names = append(names, k)
+				case map[string]interface{}:
+					m.printWithArrayTS("[]", k,v)
+					data = append(data, vvv)
+					names = append(names, k)
+				default:
+					fmt.Printf("unknown type: %T", vvv)
+					m.printWithValuesTS("{}", k, vv[0])
+				}
+			} else {
+				// empty array
+				m.printWithValuesTS("[]", k, v)
+			}
+
+		case map[string]interface{}:
+			m.printWithValuesTS(name, k, v)
+			data = append(data, vv)
+			names = append(names, k)
+		default:
+			m.printWithValuesTS("{}", k, v)
 		}
 	}
 	return data, names
@@ -342,6 +408,17 @@ func (m *Model) parseArrayJava(ms []map[string]interface{}, s []string) {
 	}
 }
 
+func (m *Model) parseArrayTS(ms []map[string]interface{}, s []string) {
+	for i, v := range ms {
+		fmt.Fprintln(m.Writer, "export class", replaceName(s[i]), "{")
+		v, n := m.parseMapTS(v)
+		fmt.Fprintln(m.Writer, "}")
+		if v != nil {
+			m.parseArrayTS(v, n)
+		}
+	}
+}
+
 func (m *Model) printValuesJava(javaType, key string) {
 	const tmpl = `
 
@@ -370,6 +447,8 @@ public void set{{.Name}}({{.Type}} {{.LowerName}}) {
 	t := template.Must(template.New("type").Parse(tmpl))
 	t.Execute(m.Writer, data)
 }
+
+
 
 func (m *Model) printWithValuesJava(javaType, key string, value interface{}) {
 	const tmpl = `
@@ -401,27 +480,57 @@ public void set{{.Name}}({{.Type}} {{.LowerName}}) {
 	t.Execute(m.Writer, data)
 }
 
+func (m *Model) printWithValuesTS(javaType, key string, value interface{}) {
+	const tmpl = `
+	public  {{.LowerName}} : {{.Type}} = {{ .Value }};
+
+	public get{{.Name}}() : {{.Type}} {
+		return this.{{.LowerName}};
+	}
+
+	public set{{.Name}}({{.LowerName}} : {{.Type}} ) {
+		this.{{.LowerName}} = {{.LowerName}};
+	}
+`
+	tmpName := replaceName(key)
+	data := struct {
+		Type      string
+		Key       string
+		Name      string
+		LowerName string
+		Value     interface{}
+	}{
+		javaType,
+		key,
+		tmpName,
+		strings.ToLower(tmpName),
+		value,
+	}
+	t := template.Must(template.New("type").Parse(tmpl))
+	t.Execute(m.Writer, data)
+}
+
 func (m *Model) printWithArrayJava(javaType, key string, value interface{}) {
 	const tmpl = `
 
-private {{.Type}} {{.LowerName}} = Generate{{ .Name }}Array();
+	private {{.Type}} {{.LowerName}} = Generate{{ .Name }}Array();
 
-public {{.Type}} get{{.Name}}() {
-	return {{.LowerName}};
-}
+	public {{.Type}} get{{.Name}}() {
+		return {{.LowerName}};
+	}
 
-public {{ .Type }} Generate{{ .Name }}Array(){
-	{{ .Type }} v = new {{ .ArrayInit }};
-	{{ range .Fields }}
-		{{ . }}
+	public {{ .Type }} Generate{{ .Name }}Array(){
+		{{ .Type }} v = new {{ .ArrayInit }};
+		{{ range .Fields }}
+			{{ . }}
 
-	{{ end }}
-	return v;
-}
+		{{ end }}
+		return v;
+	}
 
-public void set{{.Name}}({{.Type}} {{.LowerName}}) {
-	this.{{.LowerName}} = {{.LowerName}};
-}
+	public void set{{.Name}}({{.Type}} {{.LowerName}}) {
+		this.{{.LowerName}} = {{.LowerName}};
+	}
 `
 	tmpName := replaceName(key)
 	arr := value.([]interface{})
@@ -457,6 +566,90 @@ public void set{{.Name}}({{.Type}} {{.LowerName}}) {
 	%s obj%v = new %s();
 	%s
 	v[%v] = obj%v;`,
+		typeExp,
+		i,
+		typeExp, 
+		strings.Join(attrs, "\n"),
+		i,
+		i)
+
+		fields = append(fields,str)
+	}
+
+	data := struct {
+		Type      string
+		Key       string
+		Name      string
+		LowerName string
+		ArrayInit string
+		Fields    []string
+	}{
+		javaType,
+		key,
+		tmpName,
+		strings.ToLower(tmpName),
+		arrayinit,
+		fields,
+	}
+	t := template.Must(template.New("type").Parse(tmpl))
+	t.Execute(m.Writer, data)
+}
+
+
+func (m *Model) printWithArrayTS(javaType, key string, value interface{}) {
+	const tmpl = `
+
+	public {{.LowerName}} : {{.Type}} = this.Generate{{ .Name }}Array();
+
+	public  get{{.Name}}() : {{.Type}} {
+		return this.{{.LowerName}};
+	}
+
+	public Generate{{ .Name }}Array() : {{ .Type }} {
+		v : {{ .Type }} = new {{ .ArrayInit }};
+		{{ range .Fields }}
+			{{ . }}
+		{{ end }}
+		return v;
+	}
+
+	public  set{{.Name}}( {{.LowerName}} : {{.Type}} ) {
+		this.{{.LowerName}} = {{.LowerName}};
+	}
+`
+	tmpName := replaceName(key)
+	arr := value.([]interface{})
+	arrlen := len(arr)
+	typeExp := strings.Replace(javaType, "[]", "", -1)
+
+	arrayinit := "[]"
+	fields := []string{}
+
+	for i := 0; i < arrlen; i++ {
+		intf := arr[i].(map[string]interface{})
+		attrs := []string{}
+
+		for k,v := range intf {
+
+			var str string
+			switch v.(type) {
+			case string:
+				str = fmt.Sprintf(`obj%v.%s = "%v";`,i, k , v)
+			case bool:
+				str = fmt.Sprintf(`obj%v.%s = %v;`, i ,k ,v)
+			case float64:
+				str = fmt.Sprintf(`obj%v.%s = %v;`,i,k,v)
+			default:
+				str = "//nested maps are not supported"
+			}
+			attrs = append(attrs, str)
+
+		}
+
+		str := fmt.Sprintf(`
+	%s obj%v = new %s();
+	%s
+	v.push(obj%v);`,
 		typeExp,
 		i,
 		typeExp, 
@@ -570,6 +763,13 @@ package app.settings;
 
 {{if .IsArray}}//NOTE: use as an array{{end}}
 public class {{.Name}} {
+
+`
+
+const TSTempl = `
+
+{{if .IsArray}}//NOTE: use as an array{{end}}
+export class {{.Name}} {
 
 `
 

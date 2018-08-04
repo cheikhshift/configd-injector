@@ -28,6 +28,7 @@ func main() {
 	isGo := flag.Bool("go", false, "Specify if injector should use Go recipe. Your configuration data will be accessible via `map[string]interface{}`")
 	isJava := flag.Bool("java", false, "Specify if injector should use Java recipe.")
 	isPHP := flag.Bool("php", false, "Specify if injector should use PHP recipe.")
+	isTS := flag.Bool("typescript", false, "Specify if injector should use TypeScript recipe.")
 	isGoStruct := flag.Bool("goStruct", false, "Specify if injector should use Go recipe. Your configuration data json will be parsed with struct literals.")
 
 	flag.Parse()
@@ -66,6 +67,10 @@ func main() {
 
 	if *isGoStruct {
 		ExportForGoStructs(body)
+	}
+
+	if *isTS {
+		ExportForTS(body)
 	}
 
 	if *isPHP {
